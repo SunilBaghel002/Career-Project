@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Mapping - Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #764ba2;
+            border-bottom: 3px solid #764ba2;
+            margin-bottom: -2px;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #764ba2;
+            outline: none;
+        }
+
+        .button {
+            width: 100%;
+            padding: 15px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .button:hover {
+            background: #663a91;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="signup">Sign Up</div>
+        </div>
+
+        <div class="form-container active" id="login-form">
+            <form onsubmit="return handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                    <div class="error-message" id="login-email-error"></div>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                    <div class="error-message" id="login-password-error"></div>
+                </div>
+                <button type="submit" class="button" id="login-button">Login</button>
+                <div class="success-message" id="login-success"></div>
+                <div class="error-message" id="login-error"></div>
+            </form>
+        </div>
+
+        <div class="form-container" id="signup-form">
+            <form onsubmit="return handleSignup(event)">
+                <div class="input-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required>
+                    <div class="error-message" id="signup-name-error"></div>
+                </div>
+                <div class="input-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                    <div class="error-message" id="signup-email-error"></div>
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                    <div class="error-message" id="signup-password-error"></div>
+                </div>
+                <div class="input-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                    <div class="error-message" id="signup-confirm-password-error"></div>
+                </div>
+                <button type="submit" class="button" id="signup-button">Sign Up</button>
+                <div class="success-message" id="signup-success"></div>
+                <div class="error-message" id="signup-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and forms
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding form
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+                
+                // Clear all error and success messages
+                document.querySelectorAll('.error-message, .success-message').forEach(msg => {
+                    msg.style.display = 'none';
+                    msg.textContent = '';
+                });
+                
+                // Reset forms
+                document.querySelectorAll('form').forEach(form => form.reset());
+            });
+        });
+
+        // Form validation and submission handlers
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+                error.textContent = '';
+            });
+        }
+
+        function showSuccess(elementId, message) {
+            const successElement = document.getElementById(elementId);
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+        }
+
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+
+        function setLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            clearErrors();
+
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+            // Validation
+            if (password !== confirmPassword) {
+                showError('signup-confirm-password-error', 'Passwords do not match');
+                return false;
+            }
+
+            if (!validatePassword(password)) {
+                showError('signup-password-error', 'Password must be at least 8 characters long');
+                return false;
+            }
+
+            setLoading('signup-button', true);
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('signup-success', 'Account created successfully! Redirecting...');
+                    localStorage.setItem('userToken', data.token);
+                    setTimeout(() => {
+                        window.location.href = 'reason1.html';
+                    }, 2000);
+                } else {
+                    showError('signup-error', data.message || 'An error occurred during signup');
+                }
+            } catch (error) {
+                showError('signup-error', 'An error occurred. Please try again later.');
+            } finally {
+                setLoading('signup-button', false);
+            }
+
+            return false;
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            clearErrors();
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            setLoading('login-button', true);
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('login-success', 'Login successful! Redirecting...');
+                    localStorage.setItem('userToken', data.token);
+                    setTimeout(() => {
+                        window.location.href = 'reason1.html';
+                    }, 2000);
+                } else {
+                    showError('login-error', data.message || 'Invalid email or password');
+                }
+            } catch (error) {
+                showError('login-error', 'An error occurred. Please try again later.');
+            } finally {
+                setLoading('login-button', false);
+            }
+
+            return false;
+        }
+    </script>
+</body>
+</html>

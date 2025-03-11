@@ -2,10 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 // Middleware
 app.use(express.json());
@@ -21,6 +24,20 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("MongoDB connection error:", err));
 
+// User Schema
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  interests: [String],
+  skills: [String],
+  goals: [String],
+  recommendedCareers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Career" }],
+});
+
+const User = mongoose.model("User", userSchema);
+
 // Career Schema
 const careerSchema = new mongoose.Schema({
   name: String,
@@ -29,131 +46,151 @@ const careerSchema = new mongoose.Schema({
   roadmap: String,
   trends: String,
 });
+
 const Career = mongoose.model("Career", careerSchema);
+
+// Authentication Middleware
+const authenticateToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access denied" });
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    res.status(400).json({ error: "Invalid token" });
+  }
+};
+
+// Auth Routes
+app.post("/api/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    await user.save();
+
+    // Generate token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+    res.json({ token, userId: user._id });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ error: "Registration failed" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    // Validate password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    // Generate token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+    res.json({ token, userId: user._id });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Login failed" });
+  }
+});
 
 // Expanded Hardcoded Data
 const hardcodedCareers = [
-  {
-    name: "Software Development",
-    summary: "Build applications and websites.",
-    skills: "JavaScript, HTML, CSS",
-    roadmap: "Learn JS → Build projects → Internships",
-    trends: "25% job growth (2023)",
-  },
-  {
-    name: "Data Science",
-    summary: "Analyze data for insights.",
-    skills: "Python, SQL, Statistics",
-    roadmap: "Learn Python → Study stats → Datasets",
-    trends: "37% job growth (2023)",
-  },
-  {
-    name: "DevOps",
-    summary: "Manage infrastructure and deployments.",
-    skills: "Linux, Docker, AWS",
-    roadmap: "Learn Linux → Master Docker → Cloud certs",
-    trends: "Growing cloud demand",
-  },
-  {
-    name: "Machine Learning",
-    summary: "Develop AI models.",
-    skills: "Python, TensorFlow, Math",
-    roadmap: "Learn ML basics → Projects → Research",
-    trends: "AI jobs up 40% (2023)",
-  },
-  {
-    name: "Cybersecurity",
-    summary: "Protect systems from threats.",
-    skills: "Networking, Kali Linux, Ethics",
-    roadmap: "Learn networking → Certs → Practice",
-    trends: "Critical demand rising",
-  },
-  {
-    name: "UI/UX Design",
-    summary: "Design user-friendly interfaces.",
-    skills: "Figma, Adobe XD, Design",
-    roadmap: "Learn tools → Build portfolio → Freelance",
-    trends: "Growing UX focus",
-  },
+  // ... your existing hardcoded careers data ...
 ];
 
-// Enhanced Recommendation Logic
-function getRecommendations(interests, skills, goals) {
+// Enhanced Recommendation Logic with User Context
+async function getRecommendations(interests, skills, goals, userId) {
   const matchedCareers = [];
 
-  // Match based on interests
-  interests = interests.toLowerCase();
-  if (interests.includes("coding") || interests.includes("software"))
-    matchedCareers.push(hardcodedCareers[0]); // Software Dev
-  if (interests.includes("data") || interests.includes("analytics"))
-    matchedCareers.push(hardcodedCareers[1]); // Data Science
-  if (interests.includes("infrastructure") || interests.includes("cloud"))
-    matchedCareers.push(hardcodedCareers[2]); // DevOps
-  if (interests.includes("ai") || interests.includes("machine"))
-    matchedCareers.push(hardcodedCareers[3]); // Machine Learning
-  if (interests.includes("security") || interests.includes("cyber"))
-    matchedCareers.push(hardcodedCareers[4]); // Cybersecurity
-  if (interests.includes("design") || interests.includes("ui"))
-    matchedCareers.push(hardcodedCareers[5]); // UI/UX
+  // Your existing matching logic
+  // ... (keep your current getRecommendations implementation) ...
 
-  // Match based on skills
-  skills = skills.toLowerCase();
-  if (skills.includes("javascript") || skills.includes("html"))
-    matchedCareers.push(hardcodedCareers[0]);
-  if (skills.includes("python") || skills.includes("sql"))
-    matchedCareers.push(hardcodedCareers[1]);
-  if (skills.includes("linux") || skills.includes("docker"))
-    matchedCareers.push(hardcodedCareers[2]);
-  if (skills.includes("tensorflow") || skills.includes("math"))
-    matchedCareers.push(hardcodedCareers[3]);
-  if (skills.includes("networking") || skills.includes("kali"))
-    matchedCareers.push(hardcodedCareers[4]);
-  if (skills.includes("figma") || skills.includes("xd"))
-    matchedCareers.push(hardcodedCareers[5]);
+  const recommendations = [...new Set(matchedCareers.filter((c) => c))].slice(
+    0,
+    4
+  );
 
-  // Match based on goals
-  goals = goals.toLowerCase();
-  if (goals.includes("salary") || goals.includes("growth"))
-    matchedCareers.push(hardcodedCareers[0], hardcodedCareers[1]);
-  if (goals.includes("remote") || goals.includes("cloud"))
-    matchedCareers.push(hardcodedCareers[2]);
-  if (goals.includes("innovation") || goals.includes("research"))
-    matchedCareers.push(hardcodedCareers[3]);
-  if (goals.includes("security") || goals.includes("protection"))
-    matchedCareers.push(hardcodedCareers[4]);
-  if (goals.includes("creative") || goals.includes("design"))
-    matchedCareers.push(hardcodedCareers[5]);
+  // Save recommendations to user profile if userId is provided
+  if (userId) {
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        user.interests = interests.split(",");
+        user.skills = skills.split(",");
+        user.goals = goals.split(",");
+        await user.save();
+      }
+    } catch (error) {
+      console.error("Error saving user preferences:", error);
+    }
+  }
 
-  // Return unique recommendations, up to 4
-  return [...new Set(matchedCareers.filter((c) => c))].slice(0, 4);
+  return recommendations;
 }
 
-// Routes
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "index.html"))
-);
-app.get("/input", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "input.html"))
-);
-app.get("/recommendations", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "recommendations.html"))
-);
-app.get("/career", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "career.html"))
-);
+// Protected Routes
+app.get("/api/profile", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId)
+      .select("-password")
+      .populate("recommendedCareers");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching profile" });
+  }
+});
 
-// API Endpoint
-app.post("/api/submit", async (req, res) => {
+// Update existing submit endpoint to handle authentication
+app.post("/api/submit", authenticateToken, async (req, res) => {
   const { interests, skills, goals } = req.body;
   try {
     let recommendations;
     if (mongoose.connection.readyState === 1) {
       const careers = await Career.find();
-      recommendations = getRecommendations(interests, skills, goals).map(
-        (c) => careers.find((db) => db.name === c.name) || c
-      );
+      recommendations = await getRecommendations(
+        interests,
+        skills,
+        goals,
+        req.user.userId
+      ).map((c) => careers.find((db) => db.name === c.name) || c);
     } else {
-      recommendations = getRecommendations(interests, skills, goals);
+      recommendations = await getRecommendations(
+        interests,
+        skills,
+        goals,
+        req.user.userId
+      );
     }
     res.json(recommendations);
   } catch (error) {
@@ -162,11 +199,35 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
-// Seed MongoDB (optional)
+// Routes
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "index.html"))
+);
+app.get("/login", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "login.html"))
+);
+app.get("/register", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "register.html"))
+);
+app.get("/input", authenticateToken, (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "input.html"))
+);
+app.get("/recommendations", authenticateToken, (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "recommendations.html"))
+);
+app.get("/career", authenticateToken, (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "career.html"))
+);
+
+// Database seeding function (optional)
 async function seedDatabase() {
-  await Career.deleteMany({});
-  await Career.insertMany(hardcodedCareers);
-  console.log("Database seeded");
+  try {
+    await Career.deleteMany({});
+    await Career.insertMany(hardcodedCareers);
+    console.log("Database seeded successfully");
+  } catch (error) {
+    console.error("Seeding error:", error);
+  }
 }
 // seedDatabase(); // Uncomment to seed
 
