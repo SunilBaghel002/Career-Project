@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input Your Preferences</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav>
+        <a href="/">Home</a>
+        <a href="/input">Start</a>
+      </nav>
+      <div class="progress-bar"><div class="progress"></div></div>
+
+      <!-- Slide 1: Interests -->
+      <div class="slide active">
+        <h1>What excites you most?</h1>
+        <div class="options">
+          <div class="option" onclick="selectOption(0, 'coding', this)">
+            Coding
+          </div>
+          <div class="option" onclick="selectOption(0, 'data', this)">Data</div>
+          <div class="option" onclick="selectOption(0, 'infrastructure', this)">
+            Infrastructure
+          </div>
+          <div class="option" onclick="selectOption(0, 'design', this)">
+            Design
+          </div>
+        </div>
+        <div class="btn" onclick="nextSlide()">Next</div>
+      </div>
+
+      <!-- Slide 2: Skills -->
+      <div class="slide">
+        <h1>Your Skills?</h1>
+        <div class="options">
+          <div class="option" onclick="selectOption(1, 'javascript', this)">
+            JavaScript
+          </div>
+          <div class="option" onclick="selectOption(1, 'python', this)">
+            Python
+          </div>
+          <div class="option" onclick="selectOption(1, 'linux', this)">
+            Linux
+          </div>
+          <div class="option" onclick="selectOption(1, 'figma', this)">
+            Figma
+          </div>
+        </div>
+        <div class="btn-container">
+          <div class="btn" onclick="prevSlide()">Back</div>
+          <div class="btn" onclick="nextSlide()">Next</div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Goals -->
+      <div class="slide">
+        <h1>Your Goals?</h1>
+        <div class="options">
+          <div class="option" onclick="selectOption(2, 'high salary', this)">
+            High Salary
+          </div>
+          <div class="option" onclick="selectOption(2, 'remote', this)">
+            Remote Work
+          </div>
+          <div class="option" onclick="selectOption(2, 'innovation', this)">
+            Innovation
+          </div>
+          <div class="option" onclick="selectOption(2, 'creative', this)">
+            Creative Freedom
+          </div>
+        </div>
+        <div class="btn-container">
+          <div class="btn" onclick="prevSlide()">Back</div>
+          <div class="btn" onclick="submitToBackend()">Submit</div>
+        </div>
+      </div>
+    </div>
+    <script src="/script.js" defer></script>
+  </body>
+</html>

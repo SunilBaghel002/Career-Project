@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Career Mapper</title>
+  <!-- Poppins Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      /* Purple Theme */
+      --primary: #8e44ad;        /* Main purple */
+      --primary-light: #9b59b6;  /* Lighter purple */
+      --primary-dark: #732d91;   /* Darker purple */
+      --secondary: #6c3483;      /* Secondary purple tone */
+      --accent: #a569bd;         /* Accent purple */
+
+      /* Background & Text */
+      --background: #121212;     /* Dark background */
+      --surface: #1e1e1e;        /* Darker surface for containers */
+      --text: #e0e0e0;           /* Light text */
+      --gray-light: #444;        /* For borders and subtle elements */
+      --white: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: radial-gradient(circle at 50% 50%, #2c2c2c, var(--background));
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: var(--surface);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .header {
+      padding: 25px 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      margin-top: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: var(--white);
+      transition: width 0.5s ease;
+      border-radius: 10px;
+    }
+
+    /* Scrollable Content Area */
+    .content {
+      padding: 40px;
+      max-height: 500px; /* Adjust as needed */
+      overflow-y: auto;
+      position: relative;
+      scrollbar-width: thin;       /* Firefox */
+      scrollbar-color: var(--accent) var(--surface);
+    }
+    .content::-webkit-scrollbar {
+      width: 8px; /* Chrome/Safari */
+    }
+    .content::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+    .content::-webkit-scrollbar-thumb {
+      background-color: var(--accent);
+      border-radius: 4px;
+    }
+
+    /* Slides are shown/hidden dynamically */
+    .question-slide {
+      display: none;      /* hidden by default */
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+    .question-slide.active {
+      display: flex;
+    }
+
+    .question-title {
+      font-size: 22px;
+      margin-bottom: 25px;
+      color: var(--primary-light);
+    }
+
+    .options-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .option-item {
+      background: var(--surface);
+      border: 2px solid var(--gray-light);
+      border-radius: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      width: 220px; /* card width */
+      text-align: left;
+      min-height: 60px;
+    }
+
+    .option-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+    }
+
+    .option-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(142, 68, 173, 0.2),
+        transparent
+      );
+      transition: left 0.5s ease;
+    }
+
+    .option-item:hover::before {
+      left: 100%;
+    }
+
+    .option-item.selected {
+      background: rgba(142, 68, 173, 0.2);
+      border-color: var(--primary);
+    }
+
+    .option-item.selected::after {
+      content: '✓';
+      position: absolute;
+      right: 20px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid var(--gray-light);
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+      background-color: var(--surface);
+      color: var(--text);
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+    }
+
+    .checkbox-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checkbox-item input[type='checkbox'] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-top: 1px solid var(--gray-light);
+      background-color: var(--surface);
+    }
+
+    .btn {
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-secondary {
+      background: var(--gray-light);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: #555;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+    }
+    .btn-primary:disabled {
+      background: #6a1b9a;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .result-container {
+      padding: 10px;
+    }
+
+    .result-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--primary-light);
+      text-align: center;
+    }
+
+    .career-path {
+      background: linear-gradient(
+        135deg,
+        rgba(142, 68, 173, 0.1) 0%,
+        rgba(142, 68, 173, 0.15) 100%
+      );
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--accent);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .career-path:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(142, 68, 173, 0.3);
+    }
+
+    .career-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-bottom: 10px;
+    }
+
+    .career-match {
+      display: inline-block;
+      padding: 5px 10px;
+      background: var(--accent);
+      color: var(--white);
+      border-radius: 20px;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .career-description {
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .career-skills {
+      margin-top: 15px;
+    }
+    .career-skills h4 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: var(--primary-light);
+    }
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .skill-item {
+      background: var(--gray-light);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(142, 68, 173, 0.2);
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .range-slider {
+      width: 100%;
+      margin: 15px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .range-slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .range-slider input {
+      width: 100%;
+      accent-color: var(--accent);
+      height: 5px;
+      margin: 10px 0;
+    }
+    .range-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      color: #bbb;
+      font-size: 14px;
+    }
+
+    .ai-typing {
+      position: relative;
+      margin-bottom: 15px;
+      font-style: italic;
+      color: var(--primary-light);
+      text-align: center;
+    }
+    .ai-thinking {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+      justify-content: center;
+    }
+    .ai-thinking-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      animation: pulsing 1.5s infinite;
+    }
+    .ai-thinking-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ai-thinking-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes pulsing {
+      0%,
+      100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .content {
+        padding: 30px 20px;
+        height: auto; /* Let content flow on mobile */
+        max-height: 600px;
+      }
+      .footer {
+        padding: 15px 20px;
+      }
+      .header {
+        padding: 20px;
+      }
+      .question-title {
+        font-size: 20px;
+      }
+      .options-container {
+        gap: 10px;
+      }
+      .option-item {
+        width: 100%; /* On mobile, let each option take full width */
+        min-height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header">
+      <h1>AI Career Mapper</h1>
+      <p>Discover your ideal career path with our AI-powered guidance</p>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+      <!-- Slide 1: Current Status -->
+      <div class="question-slide active" id="question1">
+        <h2 class="question-title">What is your current status?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="student">I'm a student</div>
+          <div class="option-item" data-value="recent-graduate">I'm a recent graduate</div>
+          <div class="option-item" data-value="employed">I'm currently employed</div>
+          <div class="option-item" data-value="career-changer">I'm looking to change careers</div>
+          <div class="option-item" data-value="returning">I'm returning to the workforce</div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Education Level -->
+      <div class="question-slide" id="question2">
+        <h2 class="question-title">What is your highest level of education?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="high-school">High School</div>
+          <div class="option-item" data-value="certificate">Certificate/Diploma</div>
+          <div class="option-item" data-value="associate">Associate Degree</div>
+          <div class="option-item" data-value="bachelor">Bachelor's Degree</div>
+          <div class="option-item" data-value="master">Master's Degree</div>
+          <div class="option-item" data-value="phd">PhD or Doctorate</div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Field of Study/Work -->
+      <div class="question-slide" id="question3">
+        <h2 class="question-title">What is your primary field of study or work?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="technology">Technology & Computing</div>
+          <div class="option-item" data-value="business">Business & Finance</div>
+          <div class="option-item" data-value="healthcare">Healthcare & Medicine</div>
+          <div class="option-item" data-value="arts">Arts & Humanities</div>
+          <div class="option-item" data-value="engineering">Engineering</div>
+          <div class="option-item" data-value="science">Science & Research</div>
+          <div class="option-item" data-value="education">Education & Teaching</div>
+          <div class="option-item" data-value="other">Other</div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Skills (Tech) -->
+      <div class="question-slide" id="question4-tech">
+        <h2 class="question-title">Which technical skills do you possess?</h2>
+        <div class="checkbox-container">
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill1" value="javascript" />
+            <label for="skill1">JavaScript</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill2" value="python" />
+            <label for="skill2">Python</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill3" value="java" />
+            <label for="skill3">Java</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill4" value="csharp" />
+            <label for="skill4">C#</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill5" value="html-css" />
+            <label for="skill5">HTML/CSS</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill6" value="sql" />
+            <label for="skill6">SQL</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill7" value="cloud" />
+            <label for="skill7">Cloud Services</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill8" value="data-analysis" />
+            <label for="skill8">Data Analysis</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill9" value="machine-learning" />
+            <label for="skill9">Machine Learning</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="skill10" value="devops" />
+            <label for="skill10">DevOps</label>
+          </div>
+        </div>
+        <h3 style="margin-top: 20px; font-size: 18px;">Any other skills?</h3>
+        <input
+          type="text"
+          class="text-input"
+          id="otherTechSkills"
+          placeholder="Enter other technical skills..."
+        />
+      </div>
+
+      <!-- Slide 4: Skills (Business) -->
+      <div class="question-slide" id="question4-business">
+        <h2 class="question-title">Which business skills do you possess?</h2>
+        <div class="checkbox-container">
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill1" value="accounting" />
+            <label for="bskill1">Accounting</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill2" value="marketing" />
+            <label for="bskill2">Marketing</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill3" value="sales" />
+            <label for="bskill3">Sales</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill4" value="management" />
+            <label for="bskill4">Management</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill5" value="finance" />
+            <label for="bskill5">Finance</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill6" value="hr" />
+            <label for="bskill6">Human Resources</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill7" value="project-management" />
+            <label for="bskill7">Project Management</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="bskill8" value="business-analysis" />
+            <label for="bskill8">Business Analysis</label>
+          </div>
+        </div>
+        <h3 style="margin-top: 20px; font-size: 18px;">Any other skills?</h3>
+        <input
+          type="text"
+          class="text-input"
+          id="otherBusinessSkills"
+          placeholder="Enter other business skills..."
+        />
+      </div>
+
+      <!-- Slide 4: Skills (Healthcare) -->
+      <div class="question-slide" id="question4-healthcare">
+        <h2 class="question-title">Which healthcare skills do you possess?</h2>
+        <div class="checkbox-container">
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill1" value="patient-care" />
+            <label for="hskill1">Patient Care</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill2" value="medical-records" />
+            <label for="hskill2">Medical Records</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill3" value="clinical-research" />
+            <label for="hskill3">Clinical Research</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill4" value="diagnostics" />
+            <label for="hskill4">Diagnostics</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill5" value="medical-devices" />
+            <label for="hskill5">Medical Devices</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill6" value="healthcare-admin" />
+            <label for="hskill6">Healthcare Admin</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill7" value="pharmacy" />
+            <label for="hskill7">Pharmacy</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="hskill8" value="mental-health" />
+            <label for="hskill8">Mental Health</label>
+          </div>
+        </div>
+        <h3 style="margin-top: 20px; font-size: 18px;">Any other skills?</h3>
+        <input
+          type="text"
+          class="text-input"
+          id="otherHealthcareSkills"
+          placeholder="Enter other healthcare skills..."
+        />
+      </div>
+
+      <!-- Slide 4: Skills (Other) -->
+      <div class="question-slide" id="question4-other">
+        <h2 class="question-title">What skills do you possess in your field?</h2>
+        <input
+          type="text"
+          class="text-input"
+          id="generalSkills"
+          placeholder="Enter your key skills separated by commas..."
+        />
+        <h3 style="margin-top: 20px; font-size: 18px;">Years of experience in your field:</h3>
+        <div class="range-slider">
+          <div class="range-slider-label">
+            <span>Experience Level</span>
+            <span id="experienceValue">5 years</span>
+          </div>
+          <input type="range" min="0" max="20" value="5" id="experienceSlider" />
+          <div class="range-marks">
+            <span>0</span>
+            <span>5</span>
+            <span>10</span>
+            <span>15</span>
+            <span>20+</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Work Environment -->
+      <div class="question-slide" id="question5">
+        <h2 class="question-title">What work environment do you prefer?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="remote">Fully Remote</div>
+          <div class="option-item" data-value="hybrid">Hybrid (Mix of Remote and Office)</div>
+          <div class="option-item" data-value="office">Office-based</div>
+          <div class="option-item" data-value="field">Field Work (Variable Locations)</div>
+          <div class="option-item" data-value="flexible">Flexible Schedule</div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Work Values -->
+      <div class="question-slide" id="question6">
+        <h2 class="question-title">Which values are most important to you in a career?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="creativity">Creativity & Innovation</div>
+          <div class="option-item" data-value="stability">Stability & Security</div>
+          <div class="option-item" data-value="advancement">Growth & Advancement</div>
+          <div class="option-item" data-value="purpose">Purpose & Social Impact</div>
+          <div class="option-item" data-value="leadership">Leadership & Influence</div>
+          <div class="option-item" data-value="work-life">Work-Life Balance</div>
+          <div class="option-item" data-value="compensation">Compensation & Benefits</div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Career Goals -->
+      <div class="question-slide" id="question7">
+        <h2 class="question-title">What are your primary career goals?</h2>
+        <div class="options-container">
+          <div class="option-item" data-value="specialist">Become a specialist or expert</div>
+          <div class="option-item" data-value="management">Move into management</div>
+          <div class="option-item" data-value="entrepreneur">Start my own business</div>
+          <div class="option-item" data-value="impact">Make a significant impact</div>
+          <div class="option-item" data-value="financial">Achieve financial independence</div>
+          <div class="option-item" data-value="learning">Continuous learning and growth</div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Strengths -->
+      <div class="question-slide" id="question8">
+        <h2 class="question-title">What are your greatest strengths?</h2>
+        <div class="checkbox-container">
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength1" value="analytical" />
+            <label for="strength1">Analytical Thinking</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength2" value="creative" />
+            <label for="strength2">Creativity</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength3" value="communication" />
+            <label for="strength3">Communication</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength4" value="leadership" />
+            <label for="strength4">Leadership</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength5" value="teamwork" />
+            <label for="strength5">Teamwork</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength6" value="problem-solving" />
+            <label for="strength6">Problem Solving</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength7" value="detail-oriented" />
+            <label for="strength7">Detail-Oriented</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength8" value="adaptability" />
+            <label for="strength8">Adaptability</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength9" value="time-management" />
+            <label for="strength9">Time Management</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="strength10" value="empathy" />
+            <label for="strength10">Empathy</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="question-slide" id="results">
+        <div class="result-container">
+          <h2 class="result-title">Your AI-Recommended Career Paths</h2>
+          <div class="ai-typing">
+            <p>AI analyzing your profile and preferences...</p>
+            <div class="ai-thinking">
+              <div class="ai-thinking-dot"></div>
+              <div class="ai-thinking-dot"></div>
+              <div class="ai-thinking-dot"></div>
+            </div>
+          </div>
+          <div id="careerResults">
+            <!-- Career results dynamically inserted here -->
+          </div>
+          <p style="text-align: center; margin-top: 20px;">
+            These recommendations are based on your unique profile and preferences.
+            <br />
+            Consider exploring each option to find your perfect career fit!
+          </p>
+        </div>
+      </div>
+
+      <!-- LOADING OVERLAY -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Our AI is analyzing your profile...</p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <button class="btn btn-secondary" id="backBtn">Back</button>
+      <button class="btn btn-primary" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <script>
+    /******************************************************************
+     *               STORED USER ANSWERS & HELPER VARIABLES
+     ******************************************************************/
+    const userData = {
+      currentStatus: '',
+      education: '',
+      field: '',
+      techSkills: [],
+      otherTechSkills: '',
+      businessSkills: [],
+      otherBusinessSkills: '',
+      healthcareSkills: [],
+      otherHealthcareSkills: '',
+      generalSkills: '',
+      experienceYears: 5,
+      workEnvironment: '',
+      workValues: '',
+      careerGoals: '',
+      strengths: []
+    };
+
+    // For dynamic skill slide insertion
+    let dynamicSkillSlideInserted = false;
+    let selectedField = null;
+
+    // Slide order (we'll insert the correct "question4-*" after question3)
+    let slidesOrder = [
+      'question1',
+      'question2',
+      'question3',
+      // placeholder for question4
+      'question5',
+      'question6',
+      'question7',
+      'question8',
+      'results'
+    ];
+    let currentSlideIndex = 0;
+
+    // Maps field selection to the correct skill slide
+    const fieldToSkillSlide = {
+      technology: 'question4-tech',
+      business: 'question4-business',
+      healthcare: 'question4-healthcare',
+      arts: 'question4-other',
+      engineering: 'question4-other',
+      science: 'question4-other',
+      education: 'question4-other',
+      other: 'question4-other'
+    };
+
+    // For the progress bar
+    const progressBar = document.getElementById('progressBar');
+    const nextBtn = document.getElementById('nextBtn');
+    const backBtn = document.getElementById('backBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const content = document.getElementById('content');
+
+    // Range slider
+    const experienceSlider = document.getElementById('experienceSlider');
+    const experienceValue = document.getElementById('experienceValue');
+
+    // All slides
+    const allSlides = document.querySelectorAll('.question-slide');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Attach event listeners
+      setupOptionClicks();
+      setupCheckboxes();
+      showSlide(slidesOrder[currentSlideIndex]);
+      updateProgress();
+
+      // Next Button
+      nextBtn.addEventListener('click', handleNext);
+
+      // Back Button
+      backBtn.addEventListener('click', () => {
+        if (currentSlideIndex > 0) {
+          currentSlideIndex--;
+          showSlide(slidesOrder[currentSlideIndex]);
+          updateProgress();
+        }
+      });
+
+      // Experience slider
+      experienceSlider.addEventListener('input', () => {
+        experienceValue.textContent = experienceSlider.value + ' years';
+        userData.experienceYears = parseInt(experienceSlider.value, 10);
+      });
+    });
+
+    /******************************************************************
+     *                           FUNCTIONS
+     ******************************************************************/
+
+    function showSlide(slideId) {
+      // Hide all slides
+      allSlides.forEach((slide) => slide.classList.remove('active'));
+      // Show the requested slide
+      const targetSlide = document.getElementById(slideId);
+      if (targetSlide) {
+        targetSlide.classList.add('active');
+      }
+    }
+
+    function updateProgress() {
+      const totalSlides = slidesOrder.length;
+      // If we're on last slide, 100%. Otherwise, increment as we go
+      const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+      progressBar.style.width = progress + '%';
+    }
+
+    function setupOptionClicks() {
+      // Single-select option items
+      document.querySelectorAll('.option-item').forEach((item) => {
+        item.addEventListener('click', function () {
+          // Deselect siblings in the same container
+          const container = this.parentElement;
+          container.querySelectorAll('.option-item').forEach((sib) => {
+            sib.classList.remove('selected');
+          });
+          // Select current
+          this.classList.add('selected');
+        });
+      });
+    }
+
+    function setupCheckboxes() {
+      // We just rely on reading .checked later
+      // No special event needed here, but you can add if you want
+    }
+
+    function handleNext() {
+      const currentSlideId = slidesOrder[currentSlideIndex];
+      // Validate or store data from current slide
+      if (!validateAndStoreData(currentSlideId)) {
+        return; // if validation fails, do not advance
+      }
+
+      // If we just finished question3, we must insert the correct skill slide
+      if (currentSlideId === 'question3' && !dynamicSkillSlideInserted) {
+        // Insert the relevant skill slide
+        const skillSlideId = fieldToSkillSlide[selectedField] || 'question4-other';
+        slidesOrder.splice(3, 0, skillSlideId);
+        dynamicSkillSlideInserted = true;
+      }
+
+      // If we're on the second to last slide (question8), going next means results
+      // We'll do a "loading" simulation
+      if (currentSlideIndex === slidesOrder.length - 2) {
+        // Move to next (which is 'results' slide)
+        currentSlideIndex++;
+        showSlide(slidesOrder[currentSlideIndex]);
+        updateProgress();
+
+        // Show the loading overlay
+        loadingOverlay.classList.add('active');
+        // Simulate AI processing
+        setTimeout(() => {
+          loadingOverlay.classList.remove('active');
+          // Actually generate the results
+          generateCareerMatches();
+          // show results
+          currentSlideIndex++;
+          showSlide(slidesOrder[currentSlideIndex]);
+          updateProgress();
+        }, 2000);
+      } else if (currentSlideIndex < slidesOrder.length - 1) {
+        currentSlideIndex++;
+        showSlide(slidesOrder[currentSlideIndex]);
+        updateProgress();
+      }
+    }
+
+    function validateAndStoreData(slideId) {
+      switch (slideId) {
+        case 'question1': {
+          const selected = getSelectedOption('question1');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.currentStatus = selected;
+          break;
+        }
+        case 'question2': {
+          const selected = getSelectedOption('question2');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.education = selected;
+          break;
+        }
+        case 'question3': {
+          const selected = getSelectedOption('question3');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.field = selected;
+          selectedField = selected;
+          break;
+        }
+        case 'question4-tech': {
+          // Collect checkboxes
+          userData.techSkills = getCheckedValues([
+            '#skill1',
+            '#skill2',
+            '#skill3',
+            '#skill4',
+            '#skill5',
+            '#skill6',
+            '#skill7',
+            '#skill8',
+            '#skill9',
+            '#skill10'
+          ]);
+          userData.otherTechSkills = document.getElementById('otherTechSkills').value.trim();
+          break;
+        }
+        case 'question4-business': {
+          userData.businessSkills = getCheckedValues([
+            '#bskill1',
+            '#bskill2',
+            '#bskill3',
+            '#bskill4',
+            '#bskill5',
+            '#bskill6',
+            '#bskill7',
+            '#bskill8'
+          ]);
+          userData.otherBusinessSkills = document
+            .getElementById('otherBusinessSkills')
+            .value.trim();
+          break;
+        }
+        case 'question4-healthcare': {
+          userData.healthcareSkills = getCheckedValues([
+            '#hskill1',
+            '#hskill2',
+            '#hskill3',
+            '#hskill4',
+            '#hskill5',
+            '#hskill6',
+            '#hskill7',
+            '#hskill8'
+          ]);
+          userData.otherHealthcareSkills = document
+            .getElementById('otherHealthcareSkills')
+            .value.trim();
+          break;
+        }
+        case 'question4-other': {
+          userData.generalSkills = document.getElementById('generalSkills').value.trim();
+          // experience is handled by the slider event
+          break;
+        }
+        case 'question5': {
+          const selected = getSelectedOption('question5');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.workEnvironment = selected;
+          break;
+        }
+        case 'question6': {
+          const selected = getSelectedOption('question6');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.workValues = selected;
+          break;
+        }
+        case 'question7': {
+          const selected = getSelectedOption('question7');
+          if (!selected) {
+            alert('Please select an option.');
+            return false;
+          }
+          userData.careerGoals = selected;
+          break;
+        }
+        case 'question8': {
+          // Collect strengths
+          userData.strengths = getCheckedValues([
+            '#strength1',
+            '#strength2',
+            '#strength3',
+            '#strength4',
+            '#strength5',
+            '#strength6',
+            '#strength7',
+            '#strength8',
+            '#strength9',
+            '#strength10'
+          ]);
+          break;
+        }
+      }
+      return true;
+    }
+
+    function getSelectedOption(slideId) {
+      const slide = document.getElementById(slideId);
+      if (!slide) return null;
+      const selectedEl = slide.querySelector('.option-item.selected');
+      return selectedEl ? selectedEl.getAttribute('data-value') : null;
+    }
+
+    function getCheckedValues(selectors) {
+      const values = [];
+      selectors.forEach((sel) => {
+        const checkbox = document.querySelector(sel);
+        if (checkbox && checkbox.checked) {
+          values.push(checkbox.value);
+        }
+      });
+      return values;
+    }
+
+    /******************************************************************
+     *                 GENERATE CAREER MATCHES (SIMPLE AI)
+     ******************************************************************/
+    function generateCareerMatches() {
+      const resultsContainer = document.getElementById('careerResults');
+      resultsContainer.innerHTML = '';
+
+      // Sample career dataset with basic field matching and required skills
+      const careerDataset = [
+        {
+          title: 'Software Engineer',
+          field: 'technology',
+          keywords: ['javascript', 'python', 'java', 'csharp', 'html-css', 'sql', 'cloud', 'devops'],
+          description:
+            'Design, develop, and maintain software solutions. Ideal for those with programming and problem-solving skills.',
+        },
+        {
+          title: 'Data Scientist',
+          field: 'technology',
+          keywords: ['python', 'data-analysis', 'machine-learning', 'sql'],
+          description:
+            'Analyze data to extract insights and build predictive models. Strong analytical and math skills are key.',
+        },
+        {
+          title: 'Cloud Architect',
+          field: 'technology',
+          keywords: ['cloud', 'devops', 'sql'],
+          description:
+            'Plan and manage cloud infrastructures for organizations. Great for those who love systems and scalability.',
+        },
+        {
+          title: 'Project Manager',
+          field: 'business',
+          keywords: ['project-management', 'management', 'business-analysis'],
+          description:
+            'Oversee projects, coordinate teams, and ensure timely delivery. Leadership and organizational skills are crucial.',
+        },
+        {
+          title: 'Financial Analyst',
+          field: 'business',
+          keywords: ['accounting', 'finance', 'business-analysis'],
+          description:
+            'Evaluate financial data and trends to guide business decisions. Ideal for analytical minds with an interest in numbers.',
+        },
+        {
+          title: 'Nurse',
+          field: 'healthcare',
+          keywords: ['patient-care', 'medical-records', 'diagnostics'],
+          description:
+            'Provide patient care, administer treatments, and monitor patient health. Empathy and adaptability are essential.',
+        },
+        {
+          title: 'Clinical Researcher',
+          field: 'healthcare',
+          keywords: ['clinical-research', 'diagnostics', 'medical-devices'],
+          description:
+            'Conduct research to improve healthcare outcomes and medical knowledge. Perfect for detail-oriented individuals.',
+        },
+        {
+          title: 'Graphic Designer',
+          field: 'arts',
+          keywords: ['creative', 'design', 'visual'],
+          description:
+            'Create visual concepts using software or by hand to communicate ideas. Suited for creative, detail-oriented people.',
+        },
+        {
+          title: 'Research Scientist',
+          field: 'science',
+          keywords: ['analytical', 'science', 'research'],
+          description:
+            'Plan and conduct experiments to advance scientific knowledge. Ideal for detail-oriented, curious individuals.',
+        },
+        {
+          title: 'Teacher / Instructor',
+          field: 'education',
+          keywords: ['communication', 'education', 'leadership'],
+          description:
+            'Develop and deliver lessons to help students learn and grow. Great for those who enjoy mentoring and instructing.',
+        }
+      ];
+
+      // Filter or rank careers based on userData
+      let matchedCareers = careerDataset.filter((career) => {
+        // Basic filter: same field or 'other' field
+        if (userData.field === career.field) {
+          return true;
+        } else if (
+          // if user field is 'other' but career is also 'arts', 'science', etc.
+          (userData.field === 'other' &&
+            ['arts', 'science', 'education'].includes(career.field))
+        ) {
+          return true;
+        }
+        return false;
+      });
+
+      // If we found no match by field, just consider everything (fallback)
+      if (matchedCareers.length === 0) {
+        matchedCareers = careerDataset;
+      }
+
+      // Now let's do a simple scoring based on user skills
+      matchedCareers.forEach((career) => {
+        let score = 0;
+        // Combine user skills from the relevant arrays
+        let userSkills = [];
+        if (userData.field === 'technology') {
+          userSkills = [...userData.techSkills];
+          if (userData.otherTechSkills) {
+            userSkills.push(...userData.otherTechSkills.toLowerCase().split(/\s*,\s*/));
+          }
+        } else if (userData.field === 'business') {
+          userSkills = [...userData.businessSkills];
+          if (userData.otherBusinessSkills) {
+            userSkills.push(...userData.otherBusinessSkills.toLowerCase().split(/\s*,\s*/));
+          }
+        } else if (userData.field === 'healthcare') {
+          userSkills = [...userData.healthcareSkills];
+          if (userData.otherHealthcareSkills) {
+            userSkills.push(...userData.otherHealthcareSkills.toLowerCase().split(/\s*,\s*/));
+          }
+        } else {
+          // 'other'
+          if (userData.generalSkills) {
+            userSkills = userData.generalSkills.toLowerCase().split(/\s*,\s*/);
+          }
+        }
+        userSkills = userSkills.map((s) => s.toLowerCase());
+
+        // Also consider strengths as "skills" for matching
+        const userStrengths = userData.strengths.map((s) => s.toLowerCase());
+        userSkills.push(...userStrengths);
+
+        // Count how many career.keywords are in userSkills
+        career.keywords.forEach((kw) => {
+          if (userSkills.includes(kw.toLowerCase())) {
+            score++;
+          }
+        });
+        career.score = score;
+      });
+
+      // Sort matchedCareers by score descending
+      matchedCareers.sort((a, b) => b.score - a.score);
+
+      // Build top 3 results
+      const topResults = matchedCareers.slice(0, 3);
+
+      // Insert into DOM
+      topResults.forEach((career) => {
+        const totalKeywords = career.keywords.length || 1;
+        const matchPercent = Math.round((career.score / totalKeywords) * 100);
+        const pathDiv = document.createElement('div');
+        pathDiv.classList.add('career-path');
+        pathDiv.innerHTML = `
+          <div class="career-title">${career.title}</div>
+          <div class="career-match">${matchPercent}% Match</div>
+          <div class="career-description">${career.description}</div>
+          <div class="career-skills">
+            <h4>Key Skills:</h4>
+            <div class="skills-list">
+              ${career.keywords
+                .map((skill) => `<span class="skill-item">${skill}</span>`)
+                .join('')}
+            </div>
+          </div>
+        `;
+        resultsContainer.appendChild(pathDiv);
+      });
+    }
+  </script>
+</body>
+</html>
