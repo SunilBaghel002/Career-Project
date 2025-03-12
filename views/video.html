@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Your AI Video Consultation | WsCube Career Mapping</title>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #9d4edd;
+            --primary-dark: #7b2cbf;
+            --secondary: #c77dff;
+            --light: #e0aaff;
+            --dark: #1a1235;
+            --darker: #0a0420;
+            --success: #4CAF50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --gray-light: #f5f5f5;
+            --gray: #e0e0e0;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: white;
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-effect {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .glow-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -150px;
+            left: 10%;
+        }
+
+        .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-dark);
+            bottom: -200px;
+            right: 5%;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--light);
+        }
+
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Main content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        /* Form Section */
+        .booking-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
+            outline: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239d4edd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
+            outline: none;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(123, 44, 191, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-text,
+        .btn-loader {
+            transition: all 0.3s ease;
+        }
+
+        /* Info Section */
+        .booking-info {
+            color: #333;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.05) 0%, rgba(10, 4, 32, 0.05) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+        }
+
+        .info-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+        }
+
+        .info-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            min-width: 24px;
+        }
+
+        .info-text {
+            flex: 1;
+        }
+
+        .info-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: #444;
+        }
+
+        .info-text p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .consultation-types {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .consultation-types h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .type-card {
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .type-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(157, 78, 221, 0.05);
+        }
+
+        .type-card.selected::before {
+            content: "✓";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .type-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .type-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(157, 78, 221, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+
+        .type-title h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+            color: #333;
+        }
+
+        .type-title p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .type-card p {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .type-features {
+            list-style: none;
+        }
+
+        .type-features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Calendar */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            grid-column: 1 / -1;
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+        }
+
+        .month-selector h3 {
+            margin: 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        .month-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .month-btn:hover {
+            background: rgba(157, 78, 221, 0.1);
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: 500;
+            color: #555;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .calendar-day:hover:not(.disabled) {
+            background-color: rgba(157, 78, 221, 0.1);
+        }
+
+        .calendar-day.selected {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--primary);
+            font-weight: bold;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Time slots */
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .time-slot {
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--primary);
+            background-color: rgba(157, 78, 221, 0.05);
+        }
+
+        .time-slot.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .time-slot.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background-color: #f9f9f9;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: white;
+            padding: 3rem 0 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Footer Content */
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        /* Glow Effects in Footer */
+        footer .glow-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            left: 10%;
+        }
+
+        footer .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-dark);
+            bottom: -150px;
+            right: 5%;
+        }
+
+        /* Footer Sections */
+        .footer-section.logo-section .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section.logo-section .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .footer-section.logo-section p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .footer-section.links-section h3,
+        .footer-section.contact-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section.links-section ul {
+            list-style: none;
+        }
+
+        .footer-section.links-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section.links-section a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section.links-section a:hover {
+            color: var(--light);
+        }
+
+        .footer-section.contact-section p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-section.contact-section .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .footer-section.contact-section .social-icons a {
+            color: white;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section.contact-section .social-icons a:hover {
+            color: var(--light);
+        }
+
+        /* Copyright */
+        .copyright {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-section {
+                text-align: center;
+            }
+
+            .footer-section.logo-section .logo {
+                justify-content: center;
+            }
+
+            .footer-section.contact-section .social-icons {
+                justify-content: center;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-icon.success {
+            color: var(--success);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="glow-effect glow-1"></div>
+        <div class="glow-effect glow-2"></div>
+
+        <nav>
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fas fa-brain"></i></span>
+                WsCube Career AI
+            </a>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="hero">
+            <h1>Schedule Your AI Video Consultation</h1>
+            <p>Get personalized career guidance from our advanced AI system tailored to your unique skills, interests,
+                and goals.</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="booking-form">
+                <div class="form-header">
+                    <h2>Book Your Session</h2>
+                    <p>Fill out the form below to schedule your personalized AI video consultation.</p>
+                </div>
+
+                <form id="consultationForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="consultationType">Consultation Type</label>
+                        <select id="consultationType" class="form-select" required>
+                            <option value="">Select a consultation type</option>
+                            <option value="career-exploration">Career Exploration</option>
+                            <option value="skill-assessment">Skill Assessment</option>
+                            <option value="roadmap-planning">Career Roadmap Planning</option>
+                            <option value="industry-insights">Industry Insights</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="selectedDate">Select Date</label>
+                        <div id="calendar" class="calendar"></div>
+                        <input type="hidden" id="selectedDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeSlot">Select Time Slot</label>
+                        <div id="timeSlots" class="time-slots"></div>
+                        <input type="hidden" id="selectedTime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goals">Your Career Goals</label>
+                        <textarea id="goals" class="form-control" rows="4"
+                            placeholder="Briefly describe your career goals and what you hope to achieve with this consultation"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">Current Experience Level</label>
+                        <select id="experience" class="form-select">
+                            <option value="">Select your experience level</option>
+                            <option value="student">Student</option>
+                            <option value="fresher">Fresher (0-1 years)</option>
+                            <option value="junior">Junior (1-3 years)</option>
+                            <option value="mid">Mid-level (3-5 years)</option>
+                            <option value="senior">Senior (5+ years)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" id="terms" class="form-check-input" required>
+                        <label for="terms" class="form-check-label">I agree to the terms and conditions and privacy
+                            policy</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBooking">
+                        <span class="btn-text">Confirm Booking</span>
+                        <span class="btn-loader" style="display: none;">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="booking-info">
+                <div class="info-card">
+                    <h3>How It Works</h3>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="info-text">
+                            <h4>1. Book Your Session</h4>
+                            <p>Choose a date and time that works for you and complete the booking form.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-text">
+                            <h4>2. Receive Confirmation</h4>
+                            <p>You'll get an email with a unique link to join your video consultation.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div class="info-text">
+                            <h4>3. Join Your Session</h4>
+                            <p>Click the link at your scheduled time to connect with our AI career advisor.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="info-text">
+                            <h4>4. Get Personalized Insights</h4>
+                            <p>Receive a detailed report with personalized career recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="consultation-types">
+                    <h3>Choose Your Consultation Type</h3>
+
+                    <div class="type-card" data-type="career-exploration">
+                        <div class="type-header">
+                            <div class="type-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <div class="type-title">
+                                <h4>Career Exploration</h4>
+                                <p>30 minutes</p>
+                            </div>
+                        </div>
+                        <p>Discover career paths that align with your interests, skills, and personality.</p>
+                        <ul class="type-features">
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Personality assessment
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Industry recommendations
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Role suggestions</li>
+                        </ul>
+                    </div>
+
+                    <div class="type-card" data-type="skill-assessment">
+                        <div class="type-header">
+                            <div class="type-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="type-title">
+                                <h4>Skill Assessment</h4>
+                                <p>45 minutes</p>
+                            </div>
+                        </div>
+                        <p>Evaluate your current skills and identify areas for improvement.</p>
+                        <ul class="type-features">
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Technical skill analysis
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Soft skill evaluation
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Skill gap identification
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="type-card" data-type="roadmap-planning">
+                        <div class="type-header">
+                            <div class="type-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <div class="type-title">
+                                <h4>Career Roadmap Planning</h4>
+                                <p>60 minutes</p>
+                            </div>
+                        </div>
+                        <p>Create a step-by-step plan to achieve your career goals.</p>
+                        <ul class="type-features">
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Learning path creation
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Certification
+                                recommendations</li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Timeline development</li>
+                        </ul>
+                    </div>
+
+                    <div class="type-card" data-type="industry-insights">
+                        <div class="type-header">
+                            <div class="type-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="type-title">
+                                <h4>Industry Insights</h4>
+                                <p>45 minutes</p>
+                            </div>
+                        </div>
+                        <p>Get the latest trends and opportunities in your field of interest.</p>
+                        <ul class="type-features">
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Market trend analysis
+                            </li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Salary expectations</li>
+                            <li><span class="feature-icon"><i class="fas fa-check"></i></span> Growth potential insights
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="glow-effect glow-1"></div>
+        <div class="glow-effect glow-2"></div>
+        <div class="footer-content">
+            <div class="footer-section logo-section">
+                <a href="#" class="logo">
+                    <span class="logo-icon"><i class="fas fa-brain"></i></span>
+                    WsCube Career AI
+                </a>
+                <p>Your trusted consultation platform for all your needs.</p>
+            </div>
+            <div class="footer-section links-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact-section">
+                <h3>Contact Us</h3>
+                <p>123 Consult Street, City, Country</p>
+                <p>Phone: +1 234 567 890</p>
+                <p>Email: info@wscubecareer.com</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 WsCube Career AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Booking Confirmed!</h3>
+            <p>Your AI video consultation has been successfully scheduled. You'll receive a confirmation email with all
+                the details.</p>
+            <button class="modal-btn">Return to Home</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Calendar Functionality ---
+            const calendarElement = document.getElementById('calendar');
+            const timeSlotsElement = document.getElementById('timeSlots');
+            const selectedDateInput = document.getElementById('selectedDate');
+            const selectedTimeInput = document.getElementById('selectedTime');
+            const currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            function generateCalendar(month, year) {
+                calendarElement.innerHTML = '';
+                const calendarHeader = document.createElement('div');
+                calendarHeader.className = 'calendar-header';
+                const monthSelector = document.createElement('div');
+                monthSelector.className = 'month-selector';
+
+                const prevButton = document.createElement('button');
+                prevButton.className = 'month-btn prev-month';
+                prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevButton.addEventListener('click', previousMonth);
+
+                const monthYearDisplay = document.createElement('h3');
+                monthYearDisplay.textContent = `${months[month]} ${year}`;
+
+                const nextButton = document.createElement('button');
+                nextButton.className = 'month-btn next-month';
+                nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextButton.addEventListener('click', nextMonth);
+
+                monthSelector.appendChild(prevButton);
+                monthSelector.appendChild(monthYearDisplay);
+                monthSelector.appendChild(nextButton);
+                calendarHeader.appendChild(monthSelector);
+                calendarElement.appendChild(calendarHeader);
+
+                weekdays.forEach(weekday => {
+                    const weekdayElement = document.createElement('div');
+                    weekdayElement.className = 'weekday';
+                    weekdayElement.textContent = weekday;
+                    calendarElement.appendChild(weekdayElement);
+                });
+
+                const firstDay = new Date(year, month, 1);
+                const startingDay = firstDay.getDay();
+                const lastDay = new Date(year, month + 1, 0);
+                const totalDays = lastDay.getDate();
+
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'calendar-day disabled';
+                    calendarElement.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= totalDays; day++) {
+                    const date = new Date(year, month, day);
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+
+                    if (date.toDateString() === currentDate.toDateString()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    if (date < new Date(currentDate.setHours(0, 0, 0, 0))) {
+                        dayElement.classList.add('disabled');
+                    } else {
+                        dayElement.addEventListener('click', function () {
+                            document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                            this.classList.add('selected');
+                            selectedDateInput.value = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            generateTimeSlots(new Date(year, month, day));
+                        });
+                    }
+                    calendarElement.appendChild(dayElement);
+                }
+            }
+
+            function generateTimeSlots(date) {
+                timeSlotsElement.innerHTML = '';
+                const timeSlots = [
+                    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
+                    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
+                ];
+
+                timeSlots.forEach(timeSlot => {
+                    const slotElement = document.createElement('div');
+                    slotElement.className = 'time-slot';
+                    slotElement.textContent = timeSlot;
+                    const isAvailable = Math.random() > 0.3;
+
+                    if (!isAvailable) {
+                        slotElement.classList.add('disabled');
+                    } else {
+                        slotElement.addEventListener('click', function () {
+                            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                            this.classList.add('selected');
+                            selectedTimeInput.value = timeSlot;
+                        });
+                    }
+                    timeSlotsElement.appendChild(slotElement);
+                });
+            }
+
+            function previousMonth() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+            }
+
+            function nextMonth() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+            }
+
+            generateCalendar(currentMonth, currentYear);
+
+            // --- Consultation Type Card Selection ---
+            document.querySelectorAll('.type-card').forEach(card => {
+                card.addEventListener('click', function () {
+                    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    const type = this.getAttribute('data-type');
+                    document.getElementById('consultationType').value = type;
+                });
+            });
+
+            document.getElementById('consultationType').addEventListener('change', function () {
+                const selectedType = this.value;
+                document.querySelectorAll('.type-card').forEach(card => {
+                    if (card.getAttribute('data-type') === selectedType) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            });
+
+            // --- Form Submission Handling ---
+            document.getElementById('consultationForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (this.checkValidity()) {
+                    const submitBtn = document.getElementById('submitBooking');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoader = submitBtn.querySelector('.btn-loader');
+
+                    btnText.style.display = 'none';
+                    btnLoader.style.display = 'inline-block';
+
+                    setTimeout(() => {
+                        btnText.style.display = 'inline-block';
+                        btnLoader.style.display = 'none';
+                        const successModal = document.getElementById('successModal');
+                        successModal.style.display = 'block';
+
+                        this.reset();
+                        document.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('selected'));
+                        document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+                        selectedDateInput.value = '';
+                        selectedTimeInput.value = '';
+                        document.querySelectorAll('.type-card').forEach(card => card.classList.remove('selected'));
+                    }, 1500);
+                } else {
+                    this.reportValidity();
+                }
+            });
+
+            // --- Success Modal Close Functionality ---
+            const successModal = document.getElementById('successModal');
+            const closeModal = successModal.querySelector('.close-modal');
+            const modalBtn = successModal.querySelector('.modal-btn');
+
+            closeModal.addEventListener('click', function () {
+                successModal.style.display = 'none';
+            });
+
+            modalBtn.addEventListener('click', function () {
+                successModal.style.display = 'none';
+                // Uncomment below to redirect to home page
+                // window.location.href = '/';
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target === successModal) {
+                    successModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

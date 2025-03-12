@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const app = express();
@@ -30,9 +31,25 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  interests: [String],
-  skills: [String],
-  goals: [String],
+  otp: { type: String },
+  otpExpires: { type: Date },
+  preferences: {
+    currentStatus: String,
+    education: String,
+    field: String,
+    techSkills: [String],
+    otherTechSkills: String,
+    businessSkills: [String],
+    otherBusinessSkills: String,
+    healthcareSkills: [String],
+    otherHealthcareSkills: String,
+    generalSkills: String,
+    experienceYears: Number,
+    workEnvironment: String,
+    workValues: String,
+    careerGoals: String,
+    strengths: [String],
+  },
   recommendedCareers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Career" }],
 });
 
@@ -49,20 +66,54 @@ const careerSchema = new mongoose.Schema({
 
 const Career = mongoose.model("Career", careerSchema);
 
+// Nodemailer Setup
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// Function to Generate 6-Digit OTP
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Function to Send OTP Email
+const sendOTPEmail = async (email, otp) => {
+  console.log(`OTP sent to ${email}: ${otp}`);
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Your OTP for Career AI Verification",
+    html: `
+      <h2>Your OTP Code</h2>
+      <p>Your OTP code is <b>${otp}</b>. It is valid for 10 minutes.</p>
+      <p>Please enter this code to verify your account.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
 // Authentication Middleware
 const authenticateToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
+  const authHeader = req.headers.authorization;
+  console.log("Authorization Header:", authHeader);
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ error: "Access denied" });
+    console.log("No token provided");
+    return res.status(401).json({ error: "Access denied: No token provided" });
   }
-
   try {
     const verified = jwt.verify(token, JWT_SECRET);
     req.user = verified;
+    console.log("Token verified, user:", req.user);
     next();
   } catch (error) {
-    res.status(400).json({ error: "Invalid token" });
+    console.log("Invalid token:", error.message);
+    res.status(403).json({ error: "Invalid token" });
   }
 };
 
@@ -71,28 +122,30 @@ app.post("/api/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (existingUser)
       return res.status(400).json({ error: "Email already registered" });
-    }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
     const user = new User({
       name,
       email,
       password: hashedPassword,
+      otp,
+      otpExpires,
     });
 
     await user.save();
+    await sendOTPEmail(email, otp);
 
-    // Generate token
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    res.json({ token, userId: user._id });
+    res
+      .status(200)
+      .json({ message: "OTP sent to your email", userId: user._id });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ error: "Registration failed" });
@@ -103,60 +156,100 @@ app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: "User not found" });
-    }
+    if (!user) return res.status(400).json({ error: "User not found" });
 
-    // Validate password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
+    if (!validPassword)
       return res.status(400).json({ error: "Invalid password" });
-    }
 
-    // Generate token
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    res.json({ token, userId: user._id });
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    await sendOTPEmail(user.email, otp);
+
+    res
+      .status(200)
+      .json({ message: "OTP sent to your email", userId: user._id });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Login failed" });
   }
 });
 
-// Expanded Hardcoded Data
-const hardcodedCareers = [
-  // ... your existing hardcoded careers data ...
-];
+app.post("/api/verify-otp", async (req, res) => {
+  try {
+    const { userId, otp } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
 
-// Enhanced Recommendation Logic with User Context
-async function getRecommendations(interests, skills, goals, userId) {
-  const matchedCareers = [];
-
-  // Your existing matching logic
-  // ... (keep your current getRecommendations implementation) ...
-
-  const recommendations = [...new Set(matchedCareers.filter((c) => c))].slice(
-    0,
-    4
-  );
-
-  // Save recommendations to user profile if userId is provided
-  if (userId) {
-    try {
-      const user = await User.findById(userId);
-      if (user) {
-        user.interests = interests.split(",");
-        user.skills = skills.split(",");
-        user.goals = goals.split(",");
-        await user.save();
-      }
-    } catch (error) {
-      console.error("Error saving user preferences:", error);
+    if (user.otp !== otp || user.otpExpires < new Date()) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
     }
-  }
 
-  return recommendations;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    res.status(200).json({ token, userId: user._id });
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    res.status(500).json({ error: "OTP verification failed" });
+  }
+});
+
+app.post("/api/resend-otp", async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    await sendOTPEmail(user.email, otp);
+
+    res.status(200).json({ message: "OTP resent to your email" });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ error: "Failed to resend OTP" });
+  }
+});
+
+// Recommendation Logic
+async function getRecommendations(userData) {
+  const careers = await Career.find();
+  const matchedCareers = careers.filter((career) => {
+    const skillsMatch =
+      userData.techSkills?.some((skill) =>
+        career.skills.toLowerCase().includes(skill.toLowerCase())
+      ) ||
+      userData.businessSkills?.some((skill) =>
+        career.skills.toLowerCase().includes(skill.toLowerCase())
+      ) ||
+      userData.healthcareSkills?.some((skill) =>
+        career.skills.toLowerCase().includes(skill.toLowerCase())
+      ) ||
+      userData.generalSkills
+        ?.toLowerCase()
+        .includes(career.skills.toLowerCase());
+    const fieldMatch =
+      userData.field?.toLowerCase() === career.name.toLowerCase();
+    return skillsMatch || fieldMatch;
+  });
+
+  return matchedCareers.slice(0, 4);
 }
 
 // Protected Routes
@@ -165,37 +258,47 @@ app.get("/api/profile", authenticateToken, async (req, res) => {
     const user = await User.findById(req.user.userId)
       .select("-password")
       .populate("recommendedCareers");
-    res.json(user);
+    if (!user) {
+      console.log("User not found for ID:", req.user.userId);
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
   } catch (error) {
+    console.error("Error fetching profile:", error);
     res.status(500).json({ error: "Error fetching profile" });
   }
 });
 
-// Update existing submit endpoint to handle authentication
 app.post("/api/submit", authenticateToken, async (req, res) => {
-  const { interests, skills, goals } = req.body;
+  console.log("Received /api/submit request:", req.body);
   try {
-    let recommendations;
-    if (mongoose.connection.readyState === 1) {
-      const careers = await Career.find();
-      recommendations = await getRecommendations(
-        interests,
-        skills,
-        goals,
-        req.user.userId
-      ).map((c) => careers.find((db) => db.name === c.name) || c);
-    } else {
-      recommendations = await getRecommendations(
-        interests,
-        skills,
-        goals,
-        req.user.userId
-      );
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      console.log("User not found for ID:", req.user.userId);
+      return res.status(404).json({ error: "User not found" });
     }
-    res.json(recommendations);
+
+    user.preferences = { ...req.body };
+    user.recommendedCareers = [];
+    const recommendations = await getRecommendations(req.body);
+    user.recommendedCareers = recommendations.map((career) => career._id);
+    await user.save();
+
+    console.log("Preferences saved for user:", user._id);
+    res.status(200).json({
+      success: true,
+      message: "Preferences saved successfully",
+      recommendations: recommendations.map((career) => ({
+        name: career.name,
+        summary: career.summary,
+        skills: career.skills,
+        roadmap: career.roadmap,
+        trends: career.trends,
+      })),
+    });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Error in /api/submit:", error);
+    res.status(500).json({ error: "Failed to save preferences" });
   }
 });
 
@@ -203,33 +306,84 @@ app.post("/api/submit", authenticateToken, async (req, res) => {
 app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "views", "index.html"))
 );
-app.get("/login", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "login.html"))
+app.get("/auth", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "auth.html"))
 );
-app.get("/register", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "register.html"))
-);
-app.get("/input", authenticateToken, (req, res) =>
+app.get("/input", (req, res) =>
   res.sendFile(path.join(__dirname, "views", "input.html"))
 );
-app.get("/recommendations", authenticateToken, (req, res) =>
+app.get("/dashboard", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "dashboard.html"))
+);
+app.get("/recommendations", (req, res) =>
   res.sendFile(path.join(__dirname, "views", "recommendations.html"))
 );
-app.get("/career", authenticateToken, (req, res) =>
+app.get("/career", (req, res) =>
   res.sendFile(path.join(__dirname, "views", "career.html"))
 );
-
-// Database seeding function (optional)
+app.get("/landing", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "landing.html"))
+);
+app.get("/video", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "video.html"))
+);
+app.get("/chatbot", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "chatbot.html"))
+);
+// Database Seeding
 async function seedDatabase() {
   try {
     await Career.deleteMany({});
-    await Career.insertMany(hardcodedCareers);
+    await Career.insertMany([
+      {
+        name: "Software Development",
+        summary: "Build applications and websites.",
+        skills: "JavaScript, HTML, CSS",
+        roadmap: "Learn JS → Build projects → Internships",
+        trends: "25% job growth (2023)",
+      },
+      {
+        name: "Data Science",
+        summary: "Analyze data for insights.",
+        skills: "Python, SQL, Statistics",
+        roadmap: "Learn Python → Study stats → Datasets",
+        trends: "37% job growth (2023)",
+      },
+      {
+        name: "DevOps",
+        summary: "Manage infrastructure and deployments.",
+        skills: "Linux, Docker, AWS",
+        roadmap: "Learn Linux → Master Docker → Cloud certs",
+        trends: "Growing cloud demand",
+      },
+      {
+        name: "Machine Learning",
+        summary: "Develop AI models.",
+        skills: "Python, TensorFlow, Math",
+        roadmap: "Learn ML basics → Projects → Research",
+        trends: "AI jobs up 40% (2023)",
+      },
+      {
+        name: "Cybersecurity",
+        summary: "Protect systems from threats.",
+        skills: "Networking, Kali Linux, Ethics",
+        roadmap: "Learn networking → Certs → Practice",
+        trends: "Critical demand rising",
+      },
+      {
+        name: "UI/UX Design",
+        summary: "Design user-friendly interfaces.",
+        skills: "Figma, Adobe XD, Design",
+        roadmap: "Learn tools → Build portfolio → Freelance",
+        trends: "Growing UX focus",
+      },
+    ]);
     console.log("Database seeded successfully");
   } catch (error) {
     console.error("Seeding error:", error);
   }
 }
-// seedDatabase(); // Uncomment to seed
+seedDatabase();
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
