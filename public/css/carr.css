@@ -1,0 +1,334 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at center, #2a1b3d, #1a0d2e);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 450px;
+  perspective: 1000px;
+}
+
+.form-container {
+  position: relative;
+  width: 100%;
+  height: 700px;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+}
+
+.form {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  padding: 40px;
+  background: linear-gradient(135deg, #2a1b3d, #3a2b4d);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+a {
+  color: #d4a5f0;
+}
+
+.signup-form {
+  transform: rotateY(0deg);
+}
+
+.login-form {
+  transform: rotateY(180deg);
+}
+
+body.show-login .form-container {
+  transform: rotateY(180deg);
+}
+
+.form h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #d4a5f0;
+  font-weight: 600;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group i {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #9d4edd;
+  font-size: 18px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 15px 15px 15px 45px;
+  background: #3a2b4d;
+  border: 2px solid #6a0dad;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #d4a5f0;
+  box-shadow: 0 0 8px #d4a5f0;
+  outline: none;
+}
+
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 45px;
+  transform: translateY(-50%);
+  color: #a0a0a0;
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label,
+.input-group select:focus + label,
+.input-group select:valid + label {
+  top: -10px;
+  left: 15px;
+  font-size: 12px;
+  color: #d4a5f0;
+  background: #3a2b4d;
+  padding: 0 5px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #6a0dad;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+
+.checkbox input[type="checkbox"]:checked {
+  background: #6a0dad;
+}
+
+.checkbox input[type="checkbox"]:checked::after {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background: #6a0dad;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #9d4edd;
+  box-shadow: 0 0 15px #9d4edd;
+  transform: translateY(-2px);
+}
+
+.social-login {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.social-login p {
+  margin-bottom: 10px;
+  color: #a0a0a0;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-btn {
+  padding: 10px 20px;
+  background: #fff;
+  color: #333;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.success-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #4a2b6d;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 10;
+}
+
+.success-message i {
+  font-size: 40px;
+  color: #d4a5f0;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: #ff6b6b;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #d4a5f0;
+}
+
+.toggle-form {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.toggle-form a {
+  color: #d4a5f0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.toggle-form a:hover {
+  text-decoration: underline;
+}
+
+/* OTP Styles */
+.otp-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.otp-input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 2px solid #6a0dad;
+  border-radius: 5px;
+  background: #3a2b4d;
+  color: #fff;
+  outline: none;
+}
+.otp-input:focus {
+  border-color: #d4a5f0;
+  box-shadow: 0 0 8px #d4a5f0;
+}
+.otp-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ccc;
+  margin: 10px auto;
+}
+.otp-indicator.green {
+  background: #4caf50;
+}
+.otp-indicator.red {
+  background: #ff6b6b;
+}
+.resend-otp {
+  color: #d4a5f0;
+  cursor: pointer;
+  font-size: 14px;
+}
+.resend-otp.disabled {
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .form {
+    padding: 30px;
+  }
+  .form h2 {
+    font-size: 24px;
+  }
+  button {
+    font-size: 14px;
+  }
+  .social-btn {
+    font-size: 12px;
+    padding: 8px 15px;
+  }
+  .otp-input {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}
